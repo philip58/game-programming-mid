@@ -14,6 +14,42 @@ let dPressed = false;
 let projectiles = [];
 let projectileCounter = 0;
 
+let enemy1,enemy2, enemy3, enemy4;
+//enemy class
+class Enemy{
+    constructor(x,y){
+        this.x = x;
+        this.y = y;
+        this.w = 50;
+        this.h = 50;
+        this.isDead = false;
+        this.c1 = random(0,255);
+        this.c2 = random(0,255);
+        this.c3 = random(0,255);
+    }
+
+    display(){
+        fill(this.c1,this.c2,this.c3);
+        rect(this.x,this.y,this.w,this.h,50);
+    }
+
+    move(){
+            if(this.x < character.x){
+                this.x+=3;
+            }
+            if(this.x > character.x){
+                this.x-=3;
+            }
+            if(this.y < character.y){
+                this.y+=3;
+            }
+            if(this.y > character.y){
+                this.y-=3;
+            }
+    }
+
+}
+
 //projectile class
 class Projectile{
     constructor(x,y,d){
@@ -129,6 +165,10 @@ function setup(){
     character = new Character();
     room1 = new Room(0,-170);
     projectile = new Projectile((character.x)/2,(character.y)/2);
+    enemy1 = new Enemy(-900,0);
+    enemy2 = new Enemy(900,0);
+    enemy3 = new Enemy(0,500);
+    enemy4 = new Enemy(0,-500);
 }
 
 //when key is pressed set movement boolean to true
@@ -178,6 +218,10 @@ function keyReleased(){
 function draw(){
     noStroke();
     background(125, 105, 51);
+    enemy1.move();
+    enemy2.move();
+    enemy3.move();
+    enemy4.move();
     character.move();
     //center camera
     translate((1920/2),(1080/2));
@@ -193,6 +237,10 @@ function draw(){
     }
     character.display();
     projectile.x+=5;
+    enemy1.display();
+    enemy2.display();
+    enemy3.display();
+    enemy4.display();
     fill(56, 45, 15);
     room1.display();
     
