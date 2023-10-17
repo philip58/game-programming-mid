@@ -14,10 +14,13 @@ let dPressed = false;
 let projectiles = [];
 let projectileCounter = 0;
 
-let enemy1,enemy2, enemy3, enemy4;
+//enemy variables
+let enemies = [];
 //enemy class
 class Enemy{
     constructor(x,y){
+        this.startX = x;
+        this.startY = y;
         this.x = x;
         this.y = y;
         this.w = 50;
@@ -26,6 +29,7 @@ class Enemy{
         this.c1 = random(0,255);
         this.c2 = random(0,255);
         this.c3 = random(0,255);
+        this.counter = 0;
     }
 
     display(){
@@ -48,6 +52,24 @@ class Enemy{
             }
     }
 
+    die(){
+        this.x = this.startX;
+        this.y = this.startY;
+        this.counter = 0;
+    }
+
+    checkCollision(){
+        for(let i = 0; i < projectiles.length; i++){
+            if(projectiles[i].x < this.x + (this.w/2) && projectiles[i].x > this.x - (this.w/2) && projectiles[i].y < this.y + (this.h/2) && projectiles[i].y > this.y - (this.h/2) )
+            {
+                this.counter++;
+            }
+            if(this.counter >=25){
+                this.die();
+            }
+        }
+        console.log(this.counter);
+    }
 }
 
 //projectile class
@@ -61,7 +83,7 @@ class Projectile{
     }
 
     display(){
-        ellipse(this.x,this.y,this.w,this.h);
+        rect(this.x,this.y,this.w,this.h,50);
     }
 
     move(){
@@ -108,6 +130,29 @@ class Character{
         this.h = 75;
         this.projectileX = this.x;
         this.projectileY = this.X;
+        this.counter = 0;
+    }
+
+    die(){
+        this.x = 10000;
+        this.y = 10000;
+        for(let i = 0; i < enemies.length; i++){
+            enemies[i].x = 100000;
+            enemies[i].y = 100000;
+        }
+    }
+
+    checkCollision(){
+        for(let i = 0; i < enemies.length; i++){
+            if(enemies[i].x < this.x + (this.w/2) && enemies[i].x > this.x - (this.w/2) && enemies[i].y < this.y + (this.h/2) && enemies[i].y > this.y - (this.h/2) )
+            {
+                this.counter++;
+            }
+            if(this.counter >=1){
+                this.die();
+            }
+        }
+        console.log(this.counter);
     }
 
     display(){
@@ -169,6 +214,10 @@ function setup(){
     enemy2 = new Enemy(900,0);
     enemy3 = new Enemy(0,500);
     enemy4 = new Enemy(0,-500);
+    enemies.push(enemy1);
+    enemies.push(enemy2);
+    enemies.push(enemy3);
+    enemies.push(enemy4);
 }
 
 //when key is pressed set movement boolean to true
@@ -218,11 +267,8 @@ function keyReleased(){
 function draw(){
     noStroke();
     background(125, 105, 51);
-    enemy1.move();
-    enemy2.move();
-    enemy3.move();
-    enemy4.move();
     character.move();
+    character.checkCollision();
     //center camera
     translate((1920/2),(1080/2));
     //translate(-character.x/2,-character.y/2);
@@ -235,12 +281,15 @@ function draw(){
             //projectile dissapears
         }
     }
+    for(let i = 0; i < enemies.length; i++){
+        enemies[i].move();
+        enemies[i].display();
+        enemies[i].checkCollision();
+    }
+
+    fill(150,0,0);
     character.display();
     projectile.x+=5;
-    enemy1.display();
-    enemy2.display();
-    enemy3.display();
-    enemy4.display();
     fill(56, 45, 15);
     room1.display();
     
