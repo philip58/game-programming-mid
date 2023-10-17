@@ -10,21 +10,34 @@ let aPressed = false;
 let sPressed = false;
 let dPressed = false;
 
-//projectile counter
-let projectile;
+//projectile variables
+let projectiles = [];
 let projectileCounter = 0;
 
 //projectile class
 class Projectile{
-    constructor(x,y){
+    constructor(x,y,d){
         this.x = x;
         this.y = y;
-        this.w = 10;
-        this.h = 10;
+        this.w = 20;
+        this.h = 20;
+        this.direction = d;
     }
 
     display(){
         ellipse(this.x,this.y,this.w,this.h);
+    }
+
+    move(){
+        if(this.direction=="left"){
+            this.x-=10;
+        } else if(this.direction=="right"){
+            this.x+=10;
+        } else if(this.direction=="up"){
+            this.y-=10;
+        } else if(this.direction=="down"){
+            this.y+=10;
+        }
     }
 }
 
@@ -63,7 +76,7 @@ class Character{
 
     display(){
         rect(this.x,this.y,this.w,this.h,50);
-        fill(150,0,0);
+        fill(0,0,150);
         rect(this.x-10,this.y,5,30);
         rect(this.x+10,this.y,5,30);
         fill(255);
@@ -78,37 +91,32 @@ class Character{
 
     move(){
         if(wPressed){
-            this.y-=5;
+            this.y-=7;
         } 
         if(sPressed){
-            this.y+=5;
+            this.y+=7;
         }  
         if(aPressed){
-            this.x-=5;
+            this.x-=7;
         }  
         if(dPressed){
-            this.x+=5;
+            this.x+=7;
         } 
     }
 
     shoot(direction){
-        let projectileX = this.x;
-        let projectileY = this.y;
+        let projectile = new Projectile(this.x,this.y,direction);
+        projectiles.push(projectile);
 
         fill(150,0,0);
         if(direction=="left"){
-            console.log("left");
-            rect(projectileX-40,projectileY,10,10);
-            projectileX--;
+            projectile.x-=2;
         } else if(direction=="right"){
-            rect(projectileX+40,projectileY,10,10);
-            projectileX++;
+            projectile.x+=2;
         } else if(direction=="up"){
-            rect(projectileX,projectileY-50,10,10);
-            projectileY--;
+            projectile.y-=2;
         } else if(direction=="down"){
-            rect(projectileX,projectileY+50,10,10);
-            projectileY++;
+            projectile.y+=2;
         }
     }
 }
@@ -139,15 +147,15 @@ function keyPressed(){
         }
         console.log(key);
 
-        // if(key==="ArrowLeft" ){
-
-        // } else if(key==="ArrowRight"){
-            
-        // } else if(key==="ArrowUp"){
-            
-        // } else if(key==="ArrowDown"){
-            
-        // }
+        if(key==="ArrowLeft" ){
+            character.shoot("left");
+        } else if(key==="ArrowRight"){
+            character.shoot("right");
+        } else if(key==="ArrowUp"){
+            character.shoot("up");
+        } else if(key==="ArrowDown"){
+            character.shoot("down");
+        }
     }        
 
 //when key is released set movement boolean to false
@@ -171,17 +179,19 @@ function draw(){
     noStroke();
     background(125, 105, 51);
     character.move();
-    //create player and center camera
+    //center camera
     translate((1920/2),(1080/2));
     //translate(-character.x/2,-character.y/2);
     fill(205, 207, 93);
-    character.display();
     fill(150,0,0);
-    projectile.display();
-    if(projectile.x<-875 || projectile.x>875 || projectile.y < -425 || projectile.y > 425){
-        projectile.x = character.x;
-        projectile.y = character.y;
+    for(let i = 0; i < projectiles.length; i++){
+        projectiles[i].display();
+        projectiles[i].move();
+        if(projectile.x<-875 || projectile.x>875 || projectile.y < -425 || projectile.y > 425){
+            //projectile dissapears
+        }
     }
+    character.display();
     projectile.x+=5;
     fill(56, 45, 15);
     room1.display();
