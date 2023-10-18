@@ -1,6 +1,9 @@
 //player character object
 let character;
 
+//game variable
+let gameEnded = false;
+
 //wall objects
 let room1;
 
@@ -33,22 +36,25 @@ class Enemy{
     }
 
     display(){
+        drawingContext.shadowColor = color(0);
+        drawingContext.shadowBlur = 10;
         fill(this.c1,this.c2,this.c3);
         rect(this.x,this.y,this.w,this.h,50);
+        drawingContext.shadowBlur = 0;
     }
 
     move(){
             if(this.x < character.x){
-                this.x+=3;
+                this.x+=4;
             }
             if(this.x > character.x){
-                this.x-=3;
+                this.x-=4;
             }
             if(this.y < character.y){
-                this.y+=3;
+                this.y+=4;
             }
             if(this.y > character.y){
-                this.y-=3;
+                this.y-=4;
             }
     }
 
@@ -83,7 +89,10 @@ class Projectile{
     }
 
     display(){
+        drawingContext.shadowColor = color(255);
+        drawingContext.shadowBlur = 50;
         rect(this.x,this.y,this.w,this.h,50);
+        drawingContext.shadowBlur = 0;
     }
 
     move(){
@@ -136,9 +145,10 @@ class Character{
     die(){
         this.x = 10000;
         this.y = 10000;
+        gameEnded = true;
         for(let i = 0; i < enemies.length; i++){
-            enemies[i].x = 100000;
-            enemies[i].y = 100000;
+            enemies[i].x = -100000;
+            enemies[i].y = -100000;
         }
     }
 
@@ -156,6 +166,8 @@ class Character{
     }
 
     display(){
+        drawingContext.shadowColor = color(0);
+        drawingContext.shadowBlur = 10;
         rect(this.x,this.y,this.w,this.h,50);
         fill(0,0,150);
         rect(this.x-10,this.y,5,30);
@@ -168,6 +180,7 @@ class Character{
         ellipse(this.x+10,this.y-10,10,10);
         fill(0);
         ellipse(this.x,this.y+20,30,20);
+        drawingContext.shadowBlur = 0;
     }
 
     move(){
@@ -222,29 +235,38 @@ function setup(){
 
 //when key is pressed set movement boolean to true
 function keyPressed(){
-        if(wPressed === false && key=='w'){
-            wPressed = true;
-        } 
-        if(sPressed === false && key=='s'){
-            sPressed = true;
-        } 
-        if(aPressed === false && key=='a'){
-            aPressed = true;
-        } 
-        if(dPressed === false && key=='d'){
-            dPressed = true;
+    if(key==="r" || key==="R"){
+        if(gameEnded === true){
+            setup();
+            gameEnded = false;
         }
-        console.log(key);
+        for(let i = 0; i < enemies[i].length; i++){
+            enemies[i].display();
+        }
+    }
+    if(wPressed === false && key=='w'){
+        wPressed = true;
+    } 
+    if(sPressed === false && key=='s'){
+        sPressed = true;
+    } 
+    if(aPressed === false && key=='a'){
+        aPressed = true;
+    } 
+    if(dPressed === false && key=='d'){
+        dPressed = true;
+    }
+    console.log(key);
 
-        if(key==="ArrowLeft" ){
-            character.shoot("left");
-        } else if(key==="ArrowRight"){
-            character.shoot("right");
-        } else if(key==="ArrowUp"){
-            character.shoot("up");
-        } else if(key==="ArrowDown"){
-            character.shoot("down");
-        }
+    if(key==="ArrowLeft" ){
+        character.shoot("left");
+    } else if(key==="ArrowRight"){
+        character.shoot("right");
+    } else if(key==="ArrowUp"){
+        character.shoot("up");
+    } else if(key==="ArrowDown"){
+        character.shoot("down");
+    }
     }        
 
 //when key is released set movement boolean to false
@@ -267,6 +289,8 @@ function keyReleased(){
 function draw(){
     noStroke();
     background(125, 105, 51);
+    character.x = constrain(character.x,-850,850);
+    character.y = constrain(character.y,-410,410);
     character.move();
     character.checkCollision();
     //center camera
