@@ -1,7 +1,8 @@
 //player character object
 let character;
 
-//game variable
+//game variables
+let gameStarted = false;
 let gameEnded = false;
 
 //wall objects
@@ -19,6 +20,8 @@ let projectileCounter = 0;
 
 //enemy variables
 let enemies = [];
+let enemyCounter;
+let enemiesKilledCounter;
 //enemy class
 class Enemy{
     constructor(x,y){
@@ -61,16 +64,28 @@ class Enemy{
     die(){
         this.x = this.startX;
         this.y = this.startY;
-        this.counter = 0;
+        enemiesKilledCounter++;
+        if(enemiesKilledCounter===enemyCounter){
+            enemyCounter++;
+            enemiesKilledCounter = 0;
+            let enemy;
+            if(enemyCounter % 2 === 0){
+                enemy = new Enemy(-900,random(-100,100));
+            } else if(enemyCounter % 3 === 0){
+                enemy = new Enemy(900,random(-100,100));
+            } else if(enemyCounter % 5 === 0){
+                enemy = new Enemy(random(-100,100),450);
+            } else{
+                enemy = new Enemy(random(-100,100),-450);
+            }
+            enemies.push(enemy);
+        }
     }
 
     checkCollision(){
         for(let i = 0; i < projectiles.length; i++){
             if(projectiles[i].x < this.x + (this.w/2) && projectiles[i].x > this.x - (this.w/2) && projectiles[i].y < this.y + (this.h/2) && projectiles[i].y > this.y - (this.h/2) )
             {
-                this.counter++;
-            }
-            if(this.counter >=25){
                 this.die();
             }
         }
@@ -222,19 +237,20 @@ function setup(){
     rectMode(CENTER);
     character = new Character();
     room1 = new Room(0,-170);
+    projectiles = [];
+    enemies = [];
     projectile = new Projectile((character.x)/2,(character.y)/2);
-    enemy1 = new Enemy(-900,0);
-    enemy2 = new Enemy(900,0);
-    enemy3 = new Enemy(0,500);
-    enemy4 = new Enemy(0,-500);
+    enemy1 = new Enemy(-900,random(-100,100));
     enemies.push(enemy1);
-    enemies.push(enemy2);
-    enemies.push(enemy3);
-    enemies.push(enemy4);
+    enemyCounter = 1;
+    enemiesKilledCounter = 0;
 }
 
 //when key is pressed set movement boolean to true
 function keyPressed(){
+    if(key===" " && !gameStarted){
+        gameStarted = true;
+    }
     if(key==="r" || key==="R"){
         if(gameEnded === true){
             setup();
@@ -288,6 +304,7 @@ function keyReleased(){
 //draw function (runs 60 times per second)
 function draw(){
     noStroke();
+    fill(0);
     background(125, 105, 51);
     character.x = constrain(character.x,-850,850);
     character.y = constrain(character.y,-410,410);
@@ -295,9 +312,23 @@ function draw(){
     character.checkCollision();
     //center camera
     translate((1920/2),(1080/2));
+    fill(56, 45, 15);
+    textSize(25);
+    if(!gameStarted){
+        textStyle(BOLD);
+        text("Press Spacebar To Start",-150,-350);
+    }
+    textStyle(NORMAL);
+    text("Arrow Keys To Shoot",-115,-50);
+    text("WASD To Move",-750,-50);
+    text("R To Restart",600,-50);
+    textStyle(BOLD);
+    textSize(40);
+    text("Enemy Counter: " + enemyCounter,-160,350);
     //translate(-character.x/2,-character.y/2);
-    fill(205, 207, 93);
-    fill(150,0,0);
+    room1.display();
+    if(gameStarted){
+        fill(150,0,0);
     for(let i = 0; i < projectiles.length; i++){
         projectiles[i].display();
         projectiles[i].move();
@@ -314,7 +345,6 @@ function draw(){
     fill(150,0,0);
     character.display();
     projectile.x+=5;
-    fill(56, 45, 15);
-    room1.display();
+    }
     
 }
